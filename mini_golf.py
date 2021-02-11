@@ -7,6 +7,13 @@ from direct.gui.OnscreenText import OnscreenText
 from panda3d.core import WindowProperties
 from panda3d.core import GraphicsWindow
 from panda3d.core import ClockObject
+
+from direct.actor.Actor import Actor
+from panda3d.core import Point3
+from math import pi, sin, cos
+
+from world import World
+
 import sys
 
 
@@ -78,6 +85,10 @@ class MiniGolf(ShowBase):
         # player input
         self.player_input = {"mouse_x": 0, "mouse_y": 0}
         self.accept("escape", sys.exit)  # Escape quits
+
+        self.world = World(self.render, self.loader)
+        self.world.setup()
+        self.camera.setPos(0, -15, 3)
 
     def setInputValue(self, input, val):
         self.player_input[input] = val
