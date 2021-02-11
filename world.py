@@ -32,9 +32,11 @@ class World:
         self.scene.setPos(-8, 42, 0)
 
     def load_trees(self):
-        self.scene = self.loader.loadModel(random.choice(self.trees))
-        self.scene.reparentTo(self.render)
-        self.scene.setScale(0.45, 0.45, 0.45)
-        self.scene.setHpr(0, 90, 0)
-        self.scene.setPos(0, 0, 0)
+        for x in range(-100, 100, 10):
+            for z in range(0, 100, 10):
+                self.scene = self.loader.loadModel(random.choice(self.trees))
+                self.scene.reparentTo(self.render)
+                self.scene.setScale(0.35, 0.35, 0.35)
+                self.scene.setHpr(0, 90, 0)
+                self.scene.setPos(0 + x, 0 + z, 0)
 
