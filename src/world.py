@@ -6,6 +6,7 @@ import sys,os
 from panda3d.core import getModelPath
 from panda3d.core import TextureStage
 from panda3d.core import Texture
+from panda3d.core import TexGenAttrib
 
 import random
 
@@ -30,12 +31,15 @@ class World:
         self.load_trees()   
 
     def load_skybox(self):
-        skybox = self.loader.loadModel(self.mydir + "/skybox.egg")
-        skybox.reparentTo(self.render)
-        skybox.setScale(100, 100, 100)
-        skybox.setPos(0, 0, 0)
-        tex = loader.loadCubeMap(self.mydir + "/tex/skybox_#.png")
-        skybox.setTexture(tex, 1)
+        cubeMap = loader.loadCubeMap(self.mydir + "/tex/skybox_#.png")
+        spaceSkyBox = loader.loadModel('models/box.egg')
+        spaceSkyBox.setScale(10)
+        spaceSkyBox.setPos(0,0, 0)
+        spaceSkyBox.setBin('background', 0)
+        spaceSkyBox.setDepthWrite(0)
+        spaceSkyBox.setTwoSided(True)
+        spaceSkyBox.setTexGen(TextureStage.getDefault(),TexGenAttrib.MWorldCubeMap)
+        spaceSkyBox.setTexture(cubeMap, 1)
 
     def load_background(self):
         enviro = self.loader.loadModel(self.mydir + "/enviro.egg")
