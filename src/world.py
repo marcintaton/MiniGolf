@@ -1,4 +1,4 @@
-from panda3d.core import Point3
+from panda3d.core import Point3, Vec3
 from direct.actor.Actor import Actor
 from panda3d.core import Filename
 from panda3d.core import ConfigVariableSearchPath
@@ -7,13 +7,16 @@ from panda3d.core import getModelPath
 from panda3d.core import TextureStage
 from panda3d.core import Texture
 from panda3d.core import TexGenAttrib
+from panda3d.core import CollisionPlane, CollisionSphere, CollisionNode
+from panda3d.core import Plane
 
 import random
 
 class World:
 
     trees = []
-
+    tracks = []
+    
     def __init__(self, scene, loader):
         self.render = render
         self.loader = loader
@@ -59,12 +62,22 @@ class World:
         enviro.setTexScale(ts, 100, 100)
         enviro.setTexOffset(ts, -4, -2)
 
+        plane = CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0)))
+        cnodePath = enviro.attachNewNode(CollisionNode('cnode'))
+        cnodePath.node().addSolid(plane)
+
     def load_trees(self):
-        for x in range(-100, 100, random.randint(5, 10)):
-            for z in range(50, 200, random.randint(5, 10)):
+        for x in range(-200, 200, random.randint(8, 12)):
+            for z in range(-200, 200, random.randint(8, 12)):
                 tree = self.loader.loadModel(random.choice(self.trees))
                 tree.reparentTo(self.render)
                 tree.setScale(1.2, 1.2, 1.2)
-                tree.setPos(random.uniform(x/2, x) , random.uniform(z/2, z), 0)
+                x = random.uniform(x - 10, x + 10)
+                z = random.uniform(z - 10, z + 10)
+                tree.setPos( x, z, 0)
+                sphere = CollisionSphere(0, 0, 0, 3)        
+                cnodePath = tree.attachNewNode(CollisionNode('cnode'))
+                cnodePath.node().addSolid(sphere)
+
 
 
