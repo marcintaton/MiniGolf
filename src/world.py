@@ -28,7 +28,17 @@ class World:
     def setup(self):
         self.load_skybox()
         self.load_background()
-        self.load_trees()   
+        self.load_golf()
+        self.load_trees()  
+
+    def load_golf(self):
+        minigolf = self.loader.loadModel(self.mydir + "/golf.egg")
+        minigolf.reparentTo(self.render)
+        minigolf.setScale(1, 1, 1)
+        minigolf.setHpr(90, 0, 0)
+        minigolf.setPos(0, 10, 0)
+        tex = self.loader.loadTexture(self.mydir + "/tex/golf.png")
+        minigolf.setTexture(tex, 1)
 
     def load_skybox(self):
         cubeMap = loader.loadCubeMap(self.mydir + "/tex/skybox_#.png")
@@ -50,10 +60,11 @@ class World:
         enviro.setTexOffset(ts, -4, -2)
 
     def load_trees(self):
-        for x in range(-100, 100, 10):
-            for z in range(0, 200, 10):
+        for x in range(-100, 100, random.randint(5, 10)):
+            for z in range(50, 200, random.randint(5, 10)):
                 tree = self.loader.loadModel(random.choice(self.trees))
                 tree.reparentTo(self.render)
                 tree.setScale(1.2, 1.2, 1.2)
                 tree.setPos(random.uniform(x/2, x) , random.uniform(z/2, z), 0)
+
 
