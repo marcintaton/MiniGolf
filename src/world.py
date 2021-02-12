@@ -33,12 +33,9 @@ class World:
     def load_skybox(self):
         cubeMap = loader.loadCubeMap(self.mydir + "/tex/skybox_#.png")
         spaceSkyBox = loader.loadModel('models/box.egg')
-        spaceSkyBox.setScale(10)
-        spaceSkyBox.setPos(0,0, 0)
-        spaceSkyBox.setBin('background', 0)
-        spaceSkyBox.setDepthWrite(0)
-        spaceSkyBox.setTwoSided(True)
-        spaceSkyBox.setTexGen(TextureStage.getDefault(),TexGenAttrib.MWorldCubeMap)
+        spaceSkyBox.reparentTo(self.render)
+        spaceSkyBox.setScale(300)
+        spaceSkyBox.setPos(-150, 150, 0)
         spaceSkyBox.setTexture(cubeMap, 1)
 
     def load_background(self):
