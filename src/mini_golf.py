@@ -12,6 +12,8 @@ from panda3d.core import AmbientLight, VBase4, DirectionalLight
 from direct.actor.Actor import Actor
 from panda3d.core import Point3
 from math import pi, sin, cos
+from action_controller import ActionController
+from camera_data import CameraData
 
 from world import World
 
@@ -64,6 +66,8 @@ class MiniGolf(ShowBase):
             self.handle_events()
 
             ###
+
+            self.action_controller.process_inputs(self.player_input)
             ###
 
             self.task_manager.step()
@@ -84,8 +88,20 @@ class MiniGolf(ShowBase):
                                         fg=(1, 1, 1, 1), align=TextNode.ALeft, shadow=(0, 0, 0, 0.5), scale=.05, mayChange=1)
 
         # player input
-        self.player_input = {"mouse_x": 0, "mouse_y": 0}
+        self.player_input = {"mouse_x": 0, "mouse_y": 0,
+                             "left": 0, "right": 0, "up": 0, "down": 0, "fire": 0}
         self.accept("escape", sys.exit)  # Escape quits
+
+        self.accept("arrow_left",     self.setInputValue, ["left", 1])
+        self.accept("arrow_left-up",  self.setInputValue, ["left", 0])
+        self.accept("arrow_right",    self.setInputValue, ["right", 1])
+        self.accept("arrow_right-up", self.setInputValue, ["right", 0])
+        self.accept("arrow_up",       self.setInputValue, ["up", 1])
+        self.accept("arrow_up-up",    self.setInputValue, ["up", 0])
+        self.accept("arrow_down",       self.setInputValue, ["down", 1])
+        self.accept("arrow_down-up",    self.setInputValue, ["down", 0])
+        self.accept("mouse1",          self.setInputValue, ["fire", 1])
+        self.accept("mouse1-up",          self.setInputValue, ["fire", 0])
 
         directionalLight = DirectionalLight('directionalLight')
         directionalLightNP = self.render.attachNewNode(directionalLight)
@@ -96,7 +112,14 @@ class MiniGolf(ShowBase):
 
         self.world = World(self.render, self.loader)
         self.world.setup()
-        self.camera.setPos(0, -15, 3)
+
+        self.camera_data = CameraData(self.world.dummy_golf_ball)
+        self.camera.setPos(self.camera_data.position)
+
+        self.camera.reparent_to(self.camera_data.pivot_object)
+
+        self.action_controller = ActionController(
+            self.world.golf_ball, self.camera, self.camera_data)
 
     def setInputValue(self, input, val):
         self.player_input[input] = val
