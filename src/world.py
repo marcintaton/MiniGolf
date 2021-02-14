@@ -18,6 +18,7 @@ class World:
 
     trees = []
     tracks = []
+    miscs = []
 
     def __init__(self, scene, loader):
         self.render = render
@@ -30,12 +31,16 @@ class World:
     def init_models(self):
         self.trees.append(self.mydir + "/tree1.egg")
         self.trees.append(self.mydir + "/tree2.egg")
+        self.miscs.append(self.mydir + "/stump.egg")
+        self.miscs.append(self.mydir + "/rock.egg")
 
     def setup(self):
         self.load_skybox()
         self.load_background()
+        self.load_grass()
         self.load_golf()
-        self.load_trees()
+        self.load_container(self.trees, (1.2,1.2,1.2), 0.28, CollisionSphere(0, 0, 0, 3))
+        self.load_container(self.miscs, (1, 1, 1), 0.6, CollisionSphere(0, 0, 0, 1))
 
     def load_golf(self):
         self.golf_ball = self.loader.loadModel(self.mydir + "/golf.egg")
@@ -68,12 +73,11 @@ class World:
         self.enviro = self.loader.loadModel(self.mydir + "/enviro.egg")
         self.enviro.reparentTo(self.render)
         self.enviro.setScale(100, 100, 5)
-        self.enviro.setPos(0, 50, 0)
+        self.enviro.setPos(0, 50, 0.7)
         tex = self.loader.loadTexture(self.mydir + "/tex/grass.png")
         ts = TextureStage('ts')
         self.enviro.setTexture(ts, tex)
-        self.enviro.setTexScale(ts, 100, 100)
-        self.enviro.setTexOffset(ts, -4, -2)
+        self.enviro.setTexScale(ts, 200, 200)
 
         plane = CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0)))
         cnodePath = self.enviro.attachNewNode(CollisionNode('cnode'))
@@ -82,12 +86,36 @@ class World:
     def load_trees(self):
         for x in range(-200, 200, random.randint(8, 12)):
             for z in range(-200, 200, random.randint(8, 12)):
+                x = random.uniform(x - 10, x + 10)
+                z = random.uniform(z - 10, z + 10)
                 tree = self.loader.loadModel(random.choice(self.trees))
                 tree.reparentTo(self.render)
                 tree.setScale(1.2, 1.2, 1.2)
-                x = random.uniform(x - 10, x + 10)
-                z = random.uniform(z - 10, z + 10)
                 tree.setPos(x, z, 0.3)
                 sphere = CollisionSphere(0, 0, 0, 3)
                 cnodePath = tree.attachNewNode(CollisionNode('cnode'))
                 cnodePath.node().addSolid(sphere)
+
+    def load_grass(self):
+        for x in range(-200, 200, random.randint(8, 12)):
+            for z in range(-200, 200, random.randint(8, 12)):
+                x = random.uniform(x - 10, x + 10)
+                z = random.uniform(z - 10, z + 10)
+                grass =  self.loader.loadModel(self.mydir + "/grass.egg")
+                grass.reparentTo(self.render)
+                grass.setScale(1.5, 1.5, 1.5)
+                grass.setPos(x, z, 0.7)
+
+    def load_container(self, container, scale, y, sphere): 
+        for x in range(-200, 200, random.randint(8, 12)):
+            for z in range(-200, 200, random.randint(8, 12)):
+                obj = self.loader.loadModel(random.choice(container))
+                obj.reparentTo(self.render)
+                obj.setScale(scale)
+                x = random.uniform(x - 10, x + 10)
+                z = random.uniform(z - 10, z + 10)
+                obj.setPos(x, z, y)
+                sphere = sphere
+                cnodePath = obj.attachNewNode(CollisionNode('cnode'))
+                cnodePath.node().addSolid(sphere)
+
