@@ -55,7 +55,7 @@ class World:
         cubeMap = loader.loadCubeMap(self.mydir + "/tex/skybox_#.png")
         self.spaceSkyBox = loader.loadModel(self.mydir + "/skybox.egg")
         self.spaceSkyBox.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
-        self.spaceSkyBox.setTexProjector(TextureStage.getDefault(), self.render, spaceSkyBox)
+        self.spaceSkyBox.setTexProjector(TextureStage.getDefault(), self.render, self.spaceSkyBox)
         self.spaceSkyBox.setTexPos(TextureStage.getDefault(), 0.44, 0.5, 0.2)
         self.spaceSkyBox.setTexScale(TextureStage.getDefault(), 0.2)
         self.spaceSkyBox.setLightOff()
@@ -76,7 +76,7 @@ class World:
         self.enviro.setTexOffset(ts, -4, -2)
 
         plane = CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0)))
-        cnodePath = enviro.attachNewNode(CollisionNode('cnode'))
+        cnodePath = self.enviro.attachNewNode(CollisionNode('cnode'))
         cnodePath.node().addSolid(plane)
 
     def load_trees(self):
