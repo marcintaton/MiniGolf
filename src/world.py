@@ -3,8 +3,6 @@ from direct.actor.Actor import Actor
 from panda3d.physics import ActorNode, ForceNode
 from panda3d.core import Filename
 from panda3d.core import ConfigVariableSearchPath
-import sys
-import os
 from panda3d.core import getModelPath
 from panda3d.core import TextureStage
 from panda3d.core import Texture
@@ -14,7 +12,8 @@ from panda3d.core import Plane
 from panda3d.physics import LinearVectorForce, PhysicsCollisionHandler
 
 import random
-
+import sys
+import os
 
 class World:
 
@@ -48,8 +47,19 @@ class World:
         self.load_background()
 
     def load_golf_track(self):
-        self.golf_track = self.loader.loadModel(self.mydir + "/golf.egg")
-        self.golf_track.reparentTo(self.render)
+        golf_track_actor = ActorNode("golf_track")
+        self.golf_track = self.render.attachNewNode(golf_track_actor)
+        self.base.physicsMgr.attachPhysicalNode(self.golf_track.node())
+
+        self.load_collider("golf_track_collider", CollisionBox(Point3(-2.2, -1.25, 0.8), 4, 0.2, 0.5), Vec3(0,0,0), self.golf_track, True)
+        self.load_collider("golf_track_collider2", CollisionBox(Point3(-6.5, 5.5, 0.8), 0.2, 7, 0.5), Vec3(0,0,0), self.golf_track, True)
+        self.load_collider("golf_track_collider3", CollisionBox(Point3(-4.5, 9, 0.8), 0.2, 3, 0.5), Vec3(0,0,0), self.golf_track, True)
+        self.load_collider("golf_track_collider4", CollisionBox(Point3(-2.9, 4.35, 0.8), 0.2, 2.4, 0.5), Vec3(15,0,0), self.golf_track, True)
+        self.load_collider("golf_track_collider5", CollisionBox(Point3(-1, 1.3, 0.8), 2, 0.2, 0.5), Vec3(0,0,0), self.golf_track, True)
+        self.load_collider("golf_track_collider6", CollisionBox(Point3(4.1, 1.35, 0.8), 3.1, 0.2, 0.5), Vec3(-3,0,0), self.golf_track, True)
+
+        golf_track_model = self.loader.loadModel(self.mydir + "/golf.egg")
+        golf_track_model.reparentTo(self.golf_track)
         self.golf_track.setScale(0.3, 0.3, 0.3)
         self.golf_track.setHpr(90, 0, 0)
         self.golf_track.setPos(0, 10, 0.7)
@@ -59,17 +69,18 @@ class World:
     def load_golf(self):
         golf_ball_actor = ActorNode("actor")
         self.golf_ball = self.render.attachNewNode(golf_ball_actor)
+        self.base.physicsMgr.attachPhysicalNode(self.golf_ball.node())
         self.golf_ball.node().getPhysicsObject().setMass(100.)
-        self.load_collider("ball_collider",CollisionSphere(0, 0, 0, 0.2), self.golf_ball)
+        self.load_collider("ball_collider",CollisionSphere(0, 0, 0, 0.135), Vec3(0,0,0), self.golf_ball, True)
 
         golf_ball_model = loader.loadModel(self.mydir + "/golf_ball.egg")
         tex = self.loader.loadTexture(self.mydir + "/tex/golf_ball.png")
         golf_ball_model.setTexture(tex, 1)
-        golf_ball_model.setScale(0.15, 0.15, 0.15)
+        golf_ball_model.setScale(0.1, 0.1, 0.1)
         golf_ball_model.reparentTo(self.golf_ball)
         self.golf_ball.reparentTo(self.golf_track)
         self.golf_ball.setHpr(0, 0, 0)
-        self.golf_ball.setPos(-5.5, 11, 20)
+        self.golf_ball.setPos(0, 5, 1)
 
         gravityFN=ForceNode('world-forces')
         gravityFNP=self.golf_ball.attachNewNode(gravityFN)
@@ -94,7 +105,8 @@ class World:
     def load_background(self):
         enviro_actor = ActorNode("enviro")
         self.enviro = self.render.attachNewNode(enviro_actor)
-        self.load_collider("enviro_collider", CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0))), self.enviro)
+        self.base.physicsMgr.attachPhysicalNode(self.enviro.node())
+        self.load_collider("enviro_collider", CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0))), Vec3(0,0,0), self.enviro, True)
         
         enviro_model = self.loader.loadModel(self.mydir + "/enviro.egg")
         enviro_model.reparentTo(self.enviro)
@@ -113,6 +125,8 @@ class World:
                 tree_actor = ActorNode("tree")
                 tree = self.render.attachNewNode(tree_actor)                
                 tree_model = self.loader.loadModel(random.choice(self.trees))
+                self.base.physicsMgr.attachPhysicalNode(tree.node())
+                self.load_collider("enviro_collider", CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0))), Vec3(0,0,0), tree, False)
                 tree_model.reparentTo(tree)
                 tree.setScale(1.2, 1.2, 1.2)
                 tree.setPos(x, z, 0.3)
@@ -140,12 +154,15 @@ class World:
                 z = random.uniform(z - 10, z + 10)
                 obj.setPos(x, z, y)
 
-    def load_collider(self, name, collider, obj):
+    def load_collider(self, name, collider, rot, obj, flag):
         cnodePath = obj.attachNewNode(CollisionNode(name))
+        cnodePath.setHpr(rot)
         cnodePath.node().addSolid(collider)
         cnodePath.show()
         pusher = PhysicsCollisionHandler()
         pusher.addCollider(cnodePath, obj)
-        self.base.cTrav.addCollider(cnodePath, pusher)
-        self.base.physicsMgr.attachPhysicalNode(obj.node())
+        if(flag):
+            self.base.cTrav.addCollider(cnodePath, pusher)
+        else:
+            self.base.cTrav.addCollider(cnodePath, self.notifier)
 
