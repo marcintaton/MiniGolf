@@ -8,7 +8,8 @@ from panda3d.core import WindowProperties
 from panda3d.core import GraphicsWindow
 from panda3d.core import ClockObject
 from panda3d.core import AmbientLight, VBase4, DirectionalLight
-
+from panda3d.core import NodePath, CollisionTraverser, CollisionHandlerEvent
+from panda3d.physics import PhysicsCollisionHandler
 from direct.actor.Actor import Actor
 from panda3d.core import Point3
 from math import pi, sin, cos
@@ -27,9 +28,12 @@ class MiniGolf(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
         self.base = self
+        self.base.cTrav = CollisionTraverser()
+        self.notifier = CollisionHandlerEvent()
         self.task_manager = TaskManager()
         self.game_loop_running = False
         self.ui_text = "Kappa123"
+
         globalClock.setMode(ClockObject.MLimited)
         globalClock.setFrameRate(60)
         #
@@ -109,17 +113,31 @@ class MiniGolf(ShowBase):
 
         self.render.setLight(directionalLightNP)
         self.render.set_shader_auto()
+        self.base.enableParticles() 
 
-        self.world = World(self.render, self.loader)
+        self.base.cTrav.showCollisions(render)
+        self.notifier.addInPattern("%fn-in-%in")
+        self.notifier.addOutPattern("%fn-out-%in")
+        self.accept("ball-in-floor", self.onCollisionStart)
+        self.accept("ball-out-floor", self.onCollisionEnd)
+
+        self.world = World(self.render, self.loader, self.base, self.notifier)
         self.world.setup()
 
-        self.camera_data = CameraData(self.world.dummy_golf_ball)
+        self.camera_data = CameraData(self.world.golf_ball)
         self.camera.setPos(self.camera_data.position)
 
         self.camera.reparent_to(self.camera_data.pivot_object)
 
         self.action_controller = ActionController(
-            self.world.golf_ball, self.camera, self.camera_data)
+        self.world.golf_ball, self.camera, self.camera_data)
 
     def setInputValue(self, input, val):
         self.player_input[input] = val
+
+
+    def onCollisionStart(self, entry):
+        self.base.physicsMgr.addLinearForce(self.thrustForce)
+
+    def onCollisionEnd(self, entry):
+        self.base.physicsMgr.removeLinearForce(self.thrustForce)
