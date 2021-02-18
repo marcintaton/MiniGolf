@@ -63,7 +63,7 @@ class World:
         golf_track_collider.reparentTo(self.golf_track)
         collisionNode = golf_track_collider.find("**/+CollisionNode")
 
-        self.golf_track.setScale(0.5, 0.5, 0.5)
+        self.golf_track.setScale(0.8, 0.5, 0.5)
         self.golf_track.setHpr(90, 0, 0)
         self.golf_track.setPos(0, 10, 0.7)
 
@@ -81,7 +81,7 @@ class World:
         golf_ball_model.reparentTo(self.golf_ball)
         self.golf_ball.reparentTo(self.golf_track)
         self.golf_ball.setHpr(0, 0, 0)
-        self.golf_ball.setPos(-5.2, 11, 5)
+        self.golf_ball.setPos(-5.2, 2, 5)
 
         gravityFN=ForceNode('world-forces')
         gravityFNP=self.golf_ball.attachNewNode(gravityFN)
