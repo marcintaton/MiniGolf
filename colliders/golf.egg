@@ -17,6 +17,7 @@
 
 
   <Group> Cube {
+    <Collide> { Polyset descend }
     <Transform> {
       <Matrix4> {
         7.400928974151611 0.0 0.0 0.0 

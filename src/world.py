@@ -26,16 +26,19 @@ class World:
         self.loader = loader
         self.base = base
         self.notifier = notifier
-        self.mydir = Filename.fromOsSpecific(
+        self.models_dir = Filename.fromOsSpecific(
             os.path.abspath(sys.path[0])).getFullpath() + "/../models"
-        getModelPath().appendDirectory(self.mydir)
+        getModelPath().appendDirectory(self.models_dir)
+        self.colliders_dir = Filename.fromOsSpecific(
+        os.path.abspath(sys.path[0])).getFullpath() + "/../colliders"
+        getModelPath().appendDirectory(self.colliders_dir)
         self.init_models()
 
     def init_models(self):
-        self.trees.append(self.mydir + "/tree1.egg")
-        self.trees.append(self.mydir + "/tree2.egg")
-        self.miscs.append(self.mydir + "/stump.egg")
-        self.miscs.append(self.mydir + "/rock.egg")
+        self.trees.append(self.models_dir + "/tree1.egg")
+        self.trees.append(self.models_dir + "/tree2.egg")
+        self.miscs.append(self.models_dir + "/stump.egg")
+        self.miscs.append(self.models_dir + "/rock.egg")
 
     def setup(self):
         self.load_skybox()
@@ -51,36 +54,34 @@ class World:
         self.golf_track = self.render.attachNewNode(golf_track_actor)
         self.base.physicsMgr.attachPhysicalNode(self.golf_track.node())
 
-        self.load_collider("golf_track_collider", CollisionBox(Point3(-2.2, -1.25, 0.8), 4, 0.2, 0.5), Vec3(0,0,0), self.golf_track, True)
-        self.load_collider("golf_track_collider2", CollisionBox(Point3(-6.5, 5.5, 0.8), 0.2, 7, 0.5), Vec3(0,0,0), self.golf_track, True)
-        self.load_collider("golf_track_collider3", CollisionBox(Point3(-4.5, 9, 0.8), 0.2, 3, 0.5), Vec3(0,0,0), self.golf_track, True)
-        self.load_collider("golf_track_collider4", CollisionBox(Point3(-2.9, 4.35, 0.8), 0.2, 2.4, 0.5), Vec3(15,0,0), self.golf_track, True)
-        self.load_collider("golf_track_collider5", CollisionBox(Point3(-1, 1.3, 0.8), 2, 0.2, 0.5), Vec3(0,0,0), self.golf_track, True)
-        self.load_collider("golf_track_collider6", CollisionBox(Point3(4.1, 1.35, 0.8), 3.1, 0.2, 0.5), Vec3(-3,0,0), self.golf_track, True)
-
-        golf_track_model = self.loader.loadModel(self.mydir + "/golf.egg")
+        golf_track_model = self.loader.loadModel(self.models_dir + "/golf.egg")
         golf_track_model.reparentTo(self.golf_track)
-        self.golf_track.setScale(0.3, 0.3, 0.3)
+        tex = self.loader.loadTexture(self.models_dir + "/tex/golf.png")
+        golf_track_model.setTexture(tex, 1)
+
+        golf_track_collider = self.loader.loadModel(self.colliders_dir + "/golf.egg")
+        golf_track_collider.reparentTo(self.golf_track)
+        collisionNode = golf_track_collider.find("**/+CollisionNode")
+
+        self.golf_track.setScale(0.5, 0.5, 0.5)
         self.golf_track.setHpr(90, 0, 0)
         self.golf_track.setPos(0, 10, 0.7)
-        tex = self.loader.loadTexture(self.mydir + "/tex/golf.png")
-        self.golf_track.setTexture(tex, 1)
 
     def load_golf(self):
         golf_ball_actor = ActorNode("actor")
         self.golf_ball = self.render.attachNewNode(golf_ball_actor)
         self.base.physicsMgr.attachPhysicalNode(self.golf_ball.node())
         self.golf_ball.node().getPhysicsObject().setMass(100.)
-        self.load_collider("ball_collider",CollisionSphere(0, 0, 0, 0.135), Vec3(0,0,0), self.golf_ball, True)
+        self.load_collider("ball_collider", CollisionSphere(0, 0, 0, 0.2), Vec3(0,0,0), self.golf_ball, True)
 
-        golf_ball_model = loader.loadModel(self.mydir + "/golf_ball.egg")
-        tex = self.loader.loadTexture(self.mydir + "/tex/golf_ball.png")
+        golf_ball_model = loader.loadModel(self.models_dir + "/golf_ball.egg")
+        tex = self.loader.loadTexture(self.models_dir + "/tex/golf_ball.png")
         golf_ball_model.setTexture(tex, 1)
         golf_ball_model.setScale(0.1, 0.1, 0.1)
         golf_ball_model.reparentTo(self.golf_ball)
         self.golf_ball.reparentTo(self.golf_track)
         self.golf_ball.setHpr(0, 0, 0)
-        self.golf_ball.setPos(0, 5, 1)
+        self.golf_ball.setPos(-5.2, 11, 5)
 
         gravityFN=ForceNode('world-forces')
         gravityFNP=self.golf_ball.attachNewNode(gravityFN)
@@ -90,8 +91,8 @@ class World:
         self.golf_ball.node().getPhysical(0).addLinearForce(gravityForce)
 
     def load_skybox(self):
-        cubeMap = loader.loadCubeMap(self.mydir + "/tex/skybox_#.png")
-        self.spaceSkyBox = loader.loadModel(self.mydir + "/skybox.egg")
+        cubeMap = loader.loadCubeMap(self.models_dir + "/tex/skybox_#.png")
+        self.spaceSkyBox = loader.loadModel(self.models_dir + "/skybox.egg")
         self.spaceSkyBox.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldPosition)
         self.spaceSkyBox.setTexProjector(TextureStage.getDefault(), self.render, self.spaceSkyBox)
         self.spaceSkyBox.setTexPos(TextureStage.getDefault(), 0.44, 0.5, 0.2)
@@ -108,11 +109,11 @@ class World:
         self.base.physicsMgr.attachPhysicalNode(self.enviro.node())
         self.load_collider("enviro_collider", CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0))), Vec3(0,0,0), self.enviro, True)
         
-        enviro_model = self.loader.loadModel(self.mydir + "/enviro.egg")
+        enviro_model = self.loader.loadModel(self.models_dir + "/enviro.egg")
         enviro_model.reparentTo(self.enviro)
         enviro_model.setScale(100, 100, 5)
         self.enviro.setPos(0, 50, 0.7)
-        tex = self.loader.loadTexture(self.mydir + "/tex/grass.png")
+        tex = self.loader.loadTexture(self.models_dir + "/tex/grass.png")
         ts = TextureStage('ts')
         self.enviro.setTexture(ts, tex)
         self.enviro.setTexScale(ts, 200, 200)
@@ -136,7 +137,7 @@ class World:
             for z in range(-200, 200, random.randint(8, 12)):
                 x = random.uniform(x - 10, x + 10)
                 z = random.uniform(z - 10, z + 10)
-                grass =  self.loader.loadModel(self.mydir + "/grass.egg")
+                grass =  self.loader.loadModel(self.models_dir + "/grass.egg")
                 grass.reparentTo(self.render)
                 grass.setScale(1.5, 1.5, 1.5)
                 grass.setPos(x, z, 0.7)
