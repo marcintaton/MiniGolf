@@ -124,7 +124,7 @@ class MiniGolf(ShowBase):
         self.world = World(self.render, self.loader, self.base, self.notifier)
         self.world.setup()
 
-        self.camera_data = CameraData(self.world.golf_ball)
+        self.camera_data = CameraData(self.world.dummy_golf_ball)
         self.camera.setPos(self.camera_data.position)
 
         self.camera.reparent_to(self.camera_data.pivot_object)

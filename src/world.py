@@ -73,7 +73,7 @@ class World:
         self.golf_ball = self.render.attachNewNode(golf_ball_actor)
         self.base.physicsMgr.attachPhysicalNode(self.golf_ball.node())
         self.golf_ball.node().getPhysicsObject().setMass(100.)
-        self.load_collider("ball_collider", CollisionSphere(0, 0, 0, 0.2), Vec3(0,0,0), self.golf_ball, True)
+        self.load_collider("ball_collider", CollisionSphere(0, 0, 0, 0.12), Vec3(0,0,0), self.golf_ball, True)
 
         golf_ball_model = loader.loadModel(self.models_dir + "/golf_ball.egg")
         tex = self.loader.loadTexture(self.models_dir + "/tex/golf_ball.png")
@@ -82,6 +82,11 @@ class World:
         golf_ball_model.reparentTo(self.golf_ball)
         self.golf_ball.setHpr(0, 0, 0)
         self.golf_ball.setPos(-5.5, 4.5, 5)
+
+        self.dummy_golf_ball = self.render.attachNewNode("DummyGolf")
+        self.dummy_golf_ball.reparentTo(self.golf_ball)
+        self.dummy_golf_ball.setHpr(0, 0, 0)
+        self.dummy_golf_ball.setPos(0, 0, 0)
 
         gravityFN=ForceNode('world-forces')
         gravityFNP=self.golf_ball.attachNewNode(gravityFN)
