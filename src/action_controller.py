@@ -1,3 +1,10 @@
+from panda3d.physics import LinearVectorForce
+from panda3d.physics import ForceNode
+from panda3d.physics import Physical 
+from panda3d.core import Vec3
+from math import sin, cos, radians
+from numpy import sign
+
 class BallState:
 
     ready = "ready"
@@ -14,16 +21,32 @@ class ActionController:
 
         self.camera_pitch_range = [-15, 15]
 
-        self.ball_state = BallState.ready
+        self.ball_state = BallState.moving
+        self.ball_last_position = self.golf_ball.getPos()
         self.firepower = 0
         self.max_firepower = 3
+        self.force_constant = 30
 
-    def process_inputs(self, input_table):
+        self.ballFN = ForceNode('ball_force')
+        self.ballFNP = self.golf_ball.attachNewNode(self.ballFN)
+        self.force = LinearVectorForce(Vec3(0, 0, 0))
 
-        if self.ball_state == BallState.ready:
-            self.process_rotation(
+    def update(self, input_table):
+        
+        self.process_rotation(
                 input_table['left'], input_table['right'], input_table['up'], input_table['down'])
-        self.process_fire(input_table['fire'])
+        
+        if self.ball_state == BallState.ready:
+            self.process_fire(input_table['fire'])
+
+        
+        if self.ball_state != BallState.in_hole and self.ball_last_position == self.golf_ball.getPos():
+            self.ball_state = BallState.ready
+        elif self.ball_state != BallState.in_hole and self.ball_last_position != self.golf_ball.getPos():
+            self.ball_state = BallState.moving
+
+        self.ball_last_position = self.golf_ball.getPos()
+
 
     def process_rotation(self, left, right, up, down):
         heading_rotation_direction = left - right
@@ -39,15 +62,32 @@ class ActionController:
         self.camera_data.pivot_object.setP(new_pitch_value)
 
     def process_fire(self, fire):
+
         if fire == 0 and self.firepower == 0:
-            return
+            self.golf_ball.node().getPhysical(0).removeLinearForce(self.force)
+            self.force = LinearVectorForce(0, 0, 0)
         elif fire == 0 and self.firepower != 0:
             self.fire_ball()
         elif fire == 1:
             self.firepower += globalClock.getDt()
+            self.firepower = max(0, min(self.firepower, self.max_firepower))
 
     def fire_ball(self):
 
-        self.firepower = max(0, min(self.firepower, self.max_firepower))
-        print(self.firepower)
+        ###        
+
+        angle = radians(self.camera_data.pivot_object.getH())
+
+        x = -sin(angle) * self.firepower * self.force_constant + self.force_constant * sign(-sin(angle))
+        y = cos(angle) * self.firepower * self.force_constant + self.force_constant * sign(cos(angle))
+
+        self.force = LinearVectorForce(Vec3(x, y, 0))       
+
+
+        ###
+
+        self.ballFN.addForce(self.force)
+        self.golf_ball.node().getPhysical(0).addLinearForce(self.force)
+
+
         self.firepower = 0

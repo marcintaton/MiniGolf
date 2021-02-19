@@ -83,10 +83,11 @@ class World:
         self.golf_ball.setHpr(0, 0, 0)
         self.golf_ball.setPos(-5.5, 4.5, 5)
 
-        self.dummy_golf_ball = self.render.attachNewNode("DummyGolf")
-        self.dummy_golf_ball.reparentTo(self.golf_ball)
-        self.dummy_golf_ball.setHpr(0, 0, 0)
-        self.dummy_golf_ball.setPos(0, 0, 0)
+        self.camera_container = NodePath("CameraContainer")
+        self.camera_container.reparentTo(self.golf_ball)
+        self.camera_container.setHpr(0, 0, 0)
+        self.camera_container.setPos(0, 0, 0)
+        
 
         gravityFN=ForceNode('world-forces')
         gravityFNP=self.golf_ball.attachNewNode(gravityFN)

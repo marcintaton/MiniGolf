@@ -15,6 +15,7 @@ from panda3d.core import Point3
 from math import pi, sin, cos
 from action_controller import ActionController
 from camera_data import CameraData
+import math
 
 from world import World
 
@@ -60,18 +61,31 @@ class MiniGolf(ShowBase):
 
         while self.game_loop_running:
 
-            self.sample_text.setText("x: " +
+            angle = self.camera_data.pivot_object.getH()
+            self.sample_text.setText("angle: " +
                                      str("{:.2f}".format(
-                                         self.player_input["mouse_x"])) + "\n" +
-                                     "y: " +
+                                         angle)) + "\n" +
+                                     "radian: " +
                                      str("{:.2f}".format(
-                                         self.player_input["mouse_y"])))
+                                         math.radians(angle))) +"\n" +
+                                        "x: " +
+                                     str("{:.2f}".format(
+                                         -math.sin(math.radians(angle)))) +"\n" +
+                                        "y: " +
+                                     str("{:.2f}".format(
+                                         math.cos(math.radians(angle)))) +"\n" +
+                                         "firepower: " +
+                                    str("{:.2f}".format(
+                                         self.action_controller.firepower)) +"\n" +
+                                        "Ball state: " +
+                                    self.action_controller.ball_state +"\n"
+                                          )
 
             self.handle_events()
 
             ###
 
-            self.action_controller.process_inputs(self.player_input)
+            self.action_controller.update(self.player_input)
             ###
 
             self.task_manager.step()
@@ -124,7 +138,7 @@ class MiniGolf(ShowBase):
         self.world = World(self.render, self.loader, self.base, self.notifier)
         self.world.setup()
 
-        self.camera_data = CameraData(self.world.dummy_golf_ball)
+        self.camera_data = CameraData(self.world.camera_container)
         self.camera.setPos(self.camera_data.position)
 
         self.camera.reparent_to(self.camera_data.pivot_object)
