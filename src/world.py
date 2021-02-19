@@ -26,6 +26,7 @@ class World:
         self.loader = loader
         self.base = base
         self.notifier = notifier
+        self.pusher = PhysicsCollisionHandler()
         self.models_dir = Filename.fromOsSpecific(
             os.path.abspath(sys.path[0])).getFullpath() + "/../models"
         getModelPath().appendDirectory(self.models_dir)
@@ -79,9 +80,8 @@ class World:
         golf_ball_model.setTexture(tex, 1)
         golf_ball_model.setScale(0.1, 0.1, 0.1)
         golf_ball_model.reparentTo(self.golf_ball)
-        self.golf_ball.reparentTo(self.golf_track)
         self.golf_ball.setHpr(0, 0, 0)
-        self.golf_ball.setPos(-5.2, 2, 5)
+        self.golf_ball.setPos(-5.5, 4.5, 5)
 
         gravityFN=ForceNode('world-forces')
         gravityFNP=self.golf_ball.attachNewNode(gravityFN)
@@ -160,10 +160,9 @@ class World:
         cnodePath.setHpr(rot)
         cnodePath.node().addSolid(collider)
         cnodePath.show()
-        pusher = PhysicsCollisionHandler()
-        pusher.addCollider(cnodePath, obj)
+        self.pusher.addCollider(cnodePath, obj)
         if(flag):
-            self.base.cTrav.addCollider(cnodePath, pusher)
+            self.base.cTrav.addCollider(cnodePath, self.pusher)
         else:
             self.base.cTrav.addCollider(cnodePath, self.notifier)
 
