@@ -25,7 +25,7 @@ class ActionController:
         self.ball_last_position = self.golf_ball.getPos()
         self.firepower = 0
         self.max_firepower = 3
-        self.force_constant = 30
+        self.force_constant = 100
 
         self.ballFN = ForceNode('ball_force')
         self.ballFNP = self.golf_ball.attachNewNode(self.ballFN)
@@ -78,8 +78,8 @@ class ActionController:
 
         angle = radians(self.camera_data.pivot_object.getH())
 
-        x = -sin(angle) * self.firepower * self.force_constant + self.force_constant * sign(-sin(angle))
-        y = cos(angle) * self.firepower * self.force_constant + self.force_constant * sign(cos(angle))
+        x = -sin(angle) * self.firepower * self.force_constant
+        y = cos(angle) * self.firepower * self.force_constant
 
         self.force = LinearVectorForce(Vec3(x, y, 0))       
 
