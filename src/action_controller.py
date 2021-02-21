@@ -25,7 +25,7 @@ class ActionController:
         self.ball_state = BallState.moving
         self.ball_last_position = self.golf_ball.getPos()
         self.firepower = 0
-        self.max_firepower = 3
+        self.max_firepower = 15
         self.force_constant = 100
 
         self.ballFN = ForceNode('ball_force')
@@ -33,7 +33,7 @@ class ActionController:
         self.force = LinearVectorForce(Vec3(0, 0, 0))
 
     def update(self, input_table):
-        
+    
         self.process_rotation(
                 input_table['left'], input_table['right'], input_table['up'], input_table['down'])
         

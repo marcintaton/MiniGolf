@@ -80,7 +80,7 @@ class World:
     def load_golf(self):
         golf_ball_actor = ActorNode("golf_ball")
         self.golf_ball = self.render.attachNewNode(golf_ball_actor)
-        self.golf_ball.node().getPhysicsObject().setMass(250)
+        self.golf_ball.node().getPhysicsObject().setMass(5)
         self.base.physicsMgr.attachPhysicalNode(self.golf_ball.node())
         self.load_collider("golf_ball", CollisionSphere(0, 0, 0, 0.2), Vec3(0,0,0), self.golf_ball, True)
 
@@ -90,7 +90,7 @@ class World:
         golf_ball_model.setScale(0.2, 0.2, 0.2)
         golf_ball_model.reparentTo(self.golf_ball)
         self.golf_ball.setHpr(0, 0, 0)
-        self.golf_ball.setPos(3, 19, 8)
+        self.golf_ball.setPos(3, 19, 15)
 
         self.camera_container = NodePath("CameraContainer")
         self.camera_container.reparentTo(self.golf_ball)
@@ -99,7 +99,7 @@ class World:
 
         gravityFN=ForceNode('world-forces')
         gravityFNP=self.golf_ball.attachNewNode(gravityFN)
-        gravityForce=LinearVectorForce(0,0,-0.25)
+        gravityForce=LinearVectorForce(0,0,-7)
         gravityFN.addForce(gravityForce)
 
         self.golf_ball.node().getPhysical(0).addLinearForce(gravityForce)
