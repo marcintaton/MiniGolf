@@ -65,13 +65,22 @@ class World:
         golf_track_collider.reparentTo(self.golf_track)
         collisionNode = golf_track_collider.find("**/+CollisionNode")
 
+        hole_actor = ActorNode("hole")
+        hole = self.render.attachNewNode(hole_actor) 
+        self.load_collider("hole", CollisionSphere(0, 0, 0, 1.5), Vec3(0,0,0), hole, False)               
+        hole_model = loader.loadModel(self.models_dir + "/golf_ball.egg")
+        hole_model.reparentTo(hole)
+        hole.setPos(-19.5, -10.5, -1.2)
+        hole.reparentTo(self.golf_track)
+
         self.golf_track.setScale(0.8, 0.5, 0.5)
         self.golf_track.setHpr(90, 0, 0)
-        self.golf_track.setPos(0, 10, 0.9)
+        self.golf_track.setPos(-5.5, 10, 0.9)
 
     def load_golf(self):
         golf_ball_actor = ActorNode("golf_ball")
         self.golf_ball = self.render.attachNewNode(golf_ball_actor)
+        self.golf_ball.node().getPhysicsObject().setMass(250)
         self.base.physicsMgr.attachPhysicalNode(self.golf_ball.node())
         self.load_collider("golf_ball", CollisionSphere(0, 0, 0, 0.2), Vec3(0,0,0), self.golf_ball, True)
 
@@ -81,7 +90,7 @@ class World:
         golf_ball_model.setScale(0.2, 0.2, 0.2)
         golf_ball_model.reparentTo(self.golf_ball)
         self.golf_ball.setHpr(0, 0, 0)
-        self.golf_ball.setPos(5, 19, 8)
+        self.golf_ball.setPos(3, 19, 8)
 
         self.camera_container = NodePath("CameraContainer")
         self.camera_container.reparentTo(self.golf_ball)
@@ -111,8 +120,9 @@ class World:
     def load_background(self):
         enviro_actor = ActorNode("floor")
         self.enviro = self.render.attachNewNode(enviro_actor)
+        self.enviro.node().getPhysicsObject().setMass(1000)
         self.base.physicsMgr.attachPhysicalNode(self.enviro.node())
-        self.load_collider("floor", CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0))), Vec3(0,0,0), self.enviro, True)
+        self.load_collider("floor", CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0))), Vec3(0,0,0), self.enviro, False)
 
         enviro_model = self.loader.loadModel(self.models_dir + "/enviro.egg")
         enviro_model.reparentTo(self.enviro)
@@ -140,7 +150,8 @@ class World:
                 z = random.uniform(z - 10, z + 10)
                 if not (x > -25 and x < 25 and z < 25 and z > -25):
                     obj_actor = ActorNode("obj")
-                    obj = self.render.attachNewNode(obj_actor)                
+                    obj = self.render.attachNewNode(obj_actor) 
+                    self.load_collider("misc", sphere, Vec3(0,0,0), obj, False)               
                     obj_model = self.loader.loadModel(random.choice(container))
                     obj_model.reparentTo(obj)
                     obj.setScale(scale)

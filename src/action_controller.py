@@ -18,8 +18,9 @@ class ActionController:
         self.golf_ball = ball
         self.camera = camera
         self.camera_data = camera_data
-
+        self.current_pos = self.golf_ball.getPos()
         self.camera_pitch_range = [-15, 15]
+        self.counter = 0
 
         self.ball_state = BallState.moving
         self.ball_last_position = self.golf_ball.getPos()
@@ -68,7 +69,6 @@ class ActionController:
             self.force = LinearVectorForce(0, 0, 0)
         elif fire == 0 and self.firepower != 0:
             self.current_pos = self.golf_ball.getPos()
-            print(self.current_pos)
             self.fire_ball()
         elif fire == 1:
             self.firepower += globalClock.getDt()
@@ -77,6 +77,7 @@ class ActionController:
     def fire_ball(self):
 
         ###        
+        self.counter += 1
 
         angle = radians(self.camera_data.pivot_object.getH())
 
@@ -96,6 +97,13 @@ class ActionController:
 
     # TODO: reset position @marcin
     def reset_pos(self):
-        #self.golf_ball.node().getPhysical(0).clearLinearForces()
-        #self.golf_ball.setPos(self.current_pos + Point3(0,0,5))
-        #ball_last_position = self.current_pos + Point3(0,0,5)
+        self.golf_ball.node().getPhysical(0).removeLinearForce(self.force)
+        self.golf_ball.setPos(self.current_pos + Point3(0,0,5))
+        ball_last_position = self.current_pos + Point3(0,0,5)
+
+    def bounce(self, normal):
+        print("bounce")
+
+    def win(self):
+        print("won in " + str(self.counter) + "hits")
+

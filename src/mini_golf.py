@@ -133,7 +133,8 @@ class MiniGolf(ShowBase):
         self.notifier.addInPattern("%fn-in-%in")
         self.notifier.addOutPattern("%fn-out-%in")
         self.accept("golf_ball-in-floor", self.onCollisionStart)
-        self.accept("golf_ball-out-floor", self.onCollisionEnd)
+        self.accept("golf_ball-in-Cube.001", self.onBounceStart)
+        self.accept("golf_ball-in-hole", self.onGolfInHole)
 
         self.world = World(self.render, self.loader, self.base, self.notifier)
         self.world.setup()
@@ -149,9 +150,12 @@ class MiniGolf(ShowBase):
     def setInputValue(self, input, val):
         self.player_input[input] = val
 
-
     def onCollisionStart(self, entry):
         self.action_controller.reset_pos()
 
-    def onCollisionEnd(self, entry):
-        print("xd2")
+    def onGolfInHole(self, entry):
+        self.action_controller.win()
+
+    def onBounceStart(self, entry):
+        self.action_controller.bounce(entry.getContactNormal(entry.getIntoNodePath()))
+
