@@ -1,7 +1,7 @@
 from panda3d.physics import LinearVectorForce
 from panda3d.physics import ForceNode
 from panda3d.physics import Physical 
-from panda3d.core import Vec3
+from panda3d.core import Point3, Vec3
 from math import sin, cos, radians
 from numpy import sign
 
@@ -67,6 +67,8 @@ class ActionController:
             self.golf_ball.node().getPhysical(0).removeLinearForce(self.force)
             self.force = LinearVectorForce(0, 0, 0)
         elif fire == 0 and self.firepower != 0:
+            self.current_pos = self.golf_ball.getPos()
+            print(self.current_pos)
             self.fire_ball()
         elif fire == 1:
             self.firepower += globalClock.getDt()
@@ -91,3 +93,9 @@ class ActionController:
 
 
         self.firepower = 0
+
+    # TODO: reset position @marcin
+    def reset_pos(self):
+        #self.golf_ball.node().getPhysical(0).clearLinearForces()
+        #self.golf_ball.setPos(self.current_pos + Point3(0,0,5))
+        #ball_last_position = self.current_pos + Point3(0,0,5)

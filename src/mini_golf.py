@@ -30,7 +30,7 @@ class MiniGolf(ShowBase):
         ShowBase.__init__(self)
         self.base = self
         self.base.cTrav = CollisionTraverser()
-        self.notifier = CollisionHandlerEvent()
+        self.notifier = PhysicsCollisionHandler()
         self.task_manager = TaskManager()
         self.game_loop_running = False
         self.ui_text = "Kappa123"
@@ -132,8 +132,8 @@ class MiniGolf(ShowBase):
         self.base.cTrav.showCollisions(render)
         self.notifier.addInPattern("%fn-in-%in")
         self.notifier.addOutPattern("%fn-out-%in")
-        self.accept("ball-in-floor", self.onCollisionStart)
-        self.accept("ball-out-floor", self.onCollisionEnd)
+        self.accept("golf_ball-in-floor", self.onCollisionStart)
+        self.accept("golf_ball-out-floor", self.onCollisionEnd)
 
         self.world = World(self.render, self.loader, self.base, self.notifier)
         self.world.setup()
@@ -151,7 +151,7 @@ class MiniGolf(ShowBase):
 
 
     def onCollisionStart(self, entry):
-        self.base.physicsMgr.addLinearForce(self.thrustForce)
+        self.action_controller.reset_pos()
 
     def onCollisionEnd(self, entry):
-        self.base.physicsMgr.removeLinearForce(self.thrustForce)
+        print("xd2")
